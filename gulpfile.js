@@ -1,6 +1,6 @@
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
-    sass = require('gulp-sass'),
+    sass = require('gulp-sass')(require('sass')),
     connect = require('gulp-connect'),
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
@@ -11,59 +11,48 @@ var jsSources = ['js/*.js'],
     sassSources = ['sass/*.scss'],
     htmlSources = ['**/*.html'],
     outputCSSDir = 'css',
-    outputJSDir = 'js',
     outputDir = 'dist';
 
-
 gulp.task('sass', function() {
-  gulp.src(sassSources)
-  .pipe(sass({outputStyle: 'expanded'}))
-    .on('error', gutil.log)
-  .pipe(gulp.dest(outputCSSDir))
-  .pipe(connect.reload())
+  return gulp.src(sassSources)
+    .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
+    .pipe(gulp.dest(outputCSSDir))
+    .pipe(connect.reload());
 });
 
 gulp.task('js', function() {
-	gulp
-		.src(jsSources)
-		.pipe(order([
-			'js/jquery.min.js',
-			'js/jquery.easing.1.3.js',
-			'js/bootstrap.min.js',
-			'js/jquery.waypoints.min.js',
-			'js/sticky.js',
-			'js/jquery.stellar.min.js',
-			'js/hoverIntent.js',
-			'js/superfish.js',
-			'js/jquery.magnific-popup.min.js',
-			'js/magnific-popup-options.js',
-			'js/google_map.js',
-			'js/main.js'
-		], {base: './'}))
-		.pipe(concat('scripts.js'))
-		.pipe(gulp.dest(outputDir))
-		.pipe(uglify({mangle: false}))
-		.pipe(rename('scripts.min.js'))
-		.pipe(gulp.dest(outputDir))
-		.pipe(connect.reload())
+  return gulp.src(jsSources)
+    .pipe(order([
+      'js/jquery.min.js',
+      'js/jquery.easing.1.3.js',
+      // ... other js files
+      'js/main.js'
+    ], {base: './'}))
+    .pipe(concat('scripts.js'))
+    .pipe(gulp.dest(outputDir))
+    .pipe(uglify())
+    .pipe(rename('scripts.min.js'))
+    .pipe(gulp.dest(outputDir))
+    .pipe(connect.reload());
 });
 
 gulp.task('watch', function() {
-  gulp.watch(jsSources, ['js']);
-  gulp.watch(sassSources, ['sass']);
-  gulp.watch(htmlSources, ['html']);
+  gulp.watch(jsSources, gulp.series('js'));
+  gulp.watch(sassSources, gulp.series('sass'));
+  gulp.watch(htmlSources, gulp.series('html'));
 });
 
-gulp.task('connect', function() {
+gulp.task('connect', function(done) {
   connect.server({
     root: '.',
     livereload: true
-  })
+  });
+  done();
 });
 
 gulp.task('html', function() {
-  gulp.src(htmlSources)
-  .pipe(connect.reload())
+  return gulp.src(htmlSources)
+    .pipe(connect.reload());
 });
 
-gulp.task('default', ['html', 'js', 'sass', 'connect', 'watch']);
+gulp.task('default', gulp.series('html', 'js', 'sass', 'connect', 'watch'));
