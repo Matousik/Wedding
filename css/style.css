@@ -139,6 +139,13 @@ figure {
   height: 100vh;
   width: 100%;
 }
+
+.fh5co-cover {
+  background-image: url(../images/daja-matous-b.jpg);
+  background-size: cover; /* Ensures the image covers the entire container */
+  background-position: center center; /* Centers the image horizontally and vertically */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+}
 @media screen and (max-width: 768px) {
   .fh5co-cover,
   .fh5co-hero {
@@ -163,7 +170,7 @@ figure {
 }
 @media screen and (max-width: 768px) {
   .fh5co-cover {
-    heifght: inherit;
+    height: inherit;
     padding: 3em 0;
   }
 }
@@ -898,7 +905,10 @@ figure {
 
 @media screen and (max-width: 768px) {
   #fh5co-menu-wrap {
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 }
 
